@@ -1,0 +1,25 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Written by Anat Levin, Alex Rav-Acha and Dani Lischinski,
+Hebrew University of Jerusalem, Israel 2007.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+This file contains the ground truth matting data used in the paper
+A. Levin, A. Rav-Acha and D. Lischinski, "Spectral Matting"
+In Proceeding of CVPR 2007.
+
+The data consists of three examples (lion, monster and monkey), each having:
+- alpha matte.
+- several images with different backgrounds.
+- one additional image with a blue background.
+
+To compute the alpha matte, the 3 dolls were captured in front of a computer
+monitor displaying multiple backgrounds. Later, the foreground objects were
+moved and a free background image was captured.
+Having captured the foreground object in front of multiple known backgrounds,
+we have enough constraints to solve for alpha, using triangulation as
+described by:
+A. Smith and J. Blinn "Bluee Screen Mattin",É, SIGGRAPH 1996.
+
+Note that for dark image areas the measurements were amplified by noise and
+the computed alpha is slightly smaller than 1, even for fully opaque areas
+(see for example the monster teeth).
