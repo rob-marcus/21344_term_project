@@ -1,4 +1,4 @@
-"""A collection of constants used throughout the program.
+"""The user-specified parameter class and associated parsing functions. 
 
 @author: <rbm@cmu.edu>
 @date: 05/07/21
@@ -13,6 +13,9 @@ IMG_EXTS = {".jpg",
             ".tif", 
             ".tiff",
             ".png"}
+
+# TODO
+# Add video support. 
 
 def validate_in_path(path, param_str): 
   """Verifies that a path leads to either an image, or a non-empty image 
@@ -122,7 +125,7 @@ class Params():
       print(("Processed images will be stored at {} "
             + "in the program folder").format(self.out_path))
 
-    if self.in_path: # else we read from webcam. 
+    if self.in_path: # If None we read from webcam. 
       validate_in_path(self.in_path, self.in_path_str)
 
     return None

@@ -7,7 +7,7 @@ Run `python main.py -h` for usage.
 """
 
 import argparse
-import constants as consts
+import Parameters
 import sys
 
 def get_parser(): 
@@ -106,8 +106,14 @@ if __name__ == "__main__":
   parser = get_parser()
   args = parser.parse_args()
 
-  params = consts.Params(args.virtual, args.color, args.blur, args.time,
-                         args.debug, args.out_path, args.in_path, args.stitch)
+  params = Parameters.Params(args.virtual, 
+                             args.color, 
+                             args.blur, 
+                             args.time,
+                             args.debug, 
+                             args.out_path, 
+                             args.in_path, 
+                             args.stitch)
 
 
 
