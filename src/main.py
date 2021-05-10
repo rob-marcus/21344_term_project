@@ -9,6 +9,7 @@ Run `python main.py -h` for usage.
 import argparse
 import Parameters
 import sys
+from BackgroundEffect import BackgroundEffect
 
 def get_parser(): 
   """A simple CLI interface to run the program. 
@@ -115,6 +116,6 @@ if __name__ == "__main__":
                              args.in_path, 
                              args.stitch)
 
-
+  be = BackgroundEffect(params.virtual, params.color, params.blur)
 
 

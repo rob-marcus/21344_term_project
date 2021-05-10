@@ -3,19 +3,11 @@
 @author: <rbm@cmu.edu>
 @date: 05/07/21
 """
+from constants import IMG_EXTS
 import os
 import glob
 import time
 
-# Set of valid image extensions to process.
-IMG_EXTS = {".jpg", 
-            ".jpeg", 
-            ".tif", 
-            ".tiff",
-            ".png"}
-
-# TODO
-# Add video support. 
 
 def validate_in_path(path, param_str): 
   """Verifies that a path leads to either an image, or a non-empty image 
@@ -43,7 +35,7 @@ def validate_in_path(path, param_str):
     contains_valid_ext = False
 
     for ext in IMG_EXTS:
-      if glob.glob("*" + ext) != []:
+      if glob.glob(path + "*" + ext) != []:
         contains_valid_ext = True
 
     if not contains_valid_ext:
@@ -111,10 +103,15 @@ class Params():
     if self.blur:
       assert(self.blur % 2 == 1 and self.blur > 0)
 
-    # Make sure we are only specifying one background type. 
+    # Make sure we are only specifying at most one background type. 
     if (self.virtual and self.color) or (self.virtual and self.blur) or \
       (self.color and self.blur): 
       raise AssertionError("Please specify only one background type.")
+
+    # If no background type is specified, default to a blur of 3. 
+    if (self.virtual is None) and (self.color is None) and (self.blur is None):
+      self.blur = 5
+
     if self.out_path: 
       validate_out_path(self.out_path)
     else: # make the outpath just the current systime. 
