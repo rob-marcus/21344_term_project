@@ -7,6 +7,7 @@ from constants import IMG_EXTS
 import glob
 import helpers
 import os
+import skimage.transform
 
 class VirtualEffect():
   def __init__(self, virtual_path):
@@ -63,11 +64,52 @@ class VirtualEffect():
       self.num_imgs = len(self.virtual_imgs_paths)
     return None
 
+  def crop_ar(new, old): 
+    """Fit the new image to the old images aspect ratio. 
+    
+    Args: 
+      new (ndarray): the virtual background image
+      old (ndarray): the camera background image
+    """
+    # for now, a pretty simple resizing method...
+    # TODO: crop to fit, instead of just resize to fit.
+    old_shape = (old.shape[0], old.shape[1])
+
+    resized_new = skimage.transform.resize(new, old_shape, preserve_range=True)
+
+    return resized_new
+
+  def update_img_pointer(self): 
+    """Update the current_img_idx to point to the next frame in the path. 
+      Note we wrap around/treat the list in a circular manner. 
+    
+    Returns: 
+      (NoneType): updates the pointer self.current_img_idx
+    """
+    if self.current_img_idx == self.num_imgs - 1: 
+      self.current_img_idx = 0
+    else:
+      self.current_img_idx += 1
+
+    return None
+
   def apply_effect(self, background): 
-    """
+    """Apply the virtual background to the actual background. 
 
-
+    Args:
+      background (ndarray): the background matte
+        TODO update this b/c it doesn't really matter if you pass
+        the matted BG img or the full image. Conceptually, you're
+        just pasting the foreground component to the 'effected'
+        image. I suppose for programmatic clarity it may be easier 
+        to see this as just the background...
     """
+    curr_virtual_img = self.virtual_imgs[self.current_img_idx]
+    self.update_img_pointer()
+    # Crop the virtual image to the background image shape. 
+    resized_virtual_img = self.crop_ar(curr_virtual_img, background)
+
+    return resized_virtual_img
 class ColorEffect():
   def __init__(self, color): 
     self.color = color
@@ -122,9 +164,8 @@ class BackgroundEffect():
     """
     new_bg = self.get_new_background(background)
 
-    
 
 
 
 
-    
+
