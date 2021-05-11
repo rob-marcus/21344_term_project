@@ -9,6 +9,9 @@ import helpers
 import os
 import skimage.transform
 import tensorflow as tf
+import numpy as np
+from scipy.ndimage import gaussian_filter
+
 class VirtualEffect():
   def __init__(self, virtual_path):
     self.virtual_path = virtual_path
@@ -190,7 +193,7 @@ class BackgroundEffect():
 
     result = bodypix_model.predict_single(image_array)
     
-    mask = result.get_mask(threshold=0.9)
+    mask = result.get_mask(threshold=0.55)
     
     fg_mask = mask.numpy().astype(np.uint8)
     
@@ -207,7 +210,7 @@ class BackgroundEffect():
       (ndarray): the foreground image composed with the effected background. 
     """
     bg_mask, fg_mask = self.get_bg_fg_masks(image) 
-    composition = self.get_new_background(image, bg_mask)
+    composition = self.get_new_background(image, bg_mask, fg_mask)
 
     return composition
 

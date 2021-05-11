@@ -32,14 +32,15 @@ def get_parser():
                       help=" ".join(
                         ["Path to a virtual background image",
                          "or a directory of background images that will",
-                         "be rotated through."]
+                         "be rotated through. NOT IMPLEMENTED, CONCEPTUAL."]
                         )
                       )
   parser.add_argument("-c", "--color", metavar="C",
                       type=str, nargs="?", required=False,
                       help=" ".join(
                         ["Color to use as a virtual background image",
-                         "Must be one of {white, blue, yellow, random}"]
+                         "Must be one of {white, blue, yellow, random}",
+                         "NOT IMPLEMENTED, CONCEPTUAL."]
                         )
                       )
 
@@ -58,7 +59,7 @@ def get_parser():
                       action="store_true", required=False,
                       help=" ".join(
                         ["Debug flag. Will print out time required to process",
-                         "each image to stdout."]
+                         "each image to stdout. NOT IMPLEMENTED, CONCEPTUAL."]
                         )
                       )
 
@@ -67,7 +68,7 @@ def get_parser():
                       help=" ".join(
                         ["Debug flag. Will print out statistics and program",
                          "states, as well as plots of image at various",
-                         "processing states."]
+                         "processing states. NOT IMPLEMENTED, CONCEPTUAL."]
                         )
                       )
 
@@ -87,7 +88,7 @@ def get_parser():
                       help=" ".join(
                         ["In path for an image, or a directory of images.",
                          "If directory does not exist, or the path is not",
-                         "An image, an assertion error will be thrown.",
+                         "an image, an assertion error will be thrown.",
                          "If unspecified, default to reading from the webcam"]
                         )
                       )
@@ -96,8 +97,8 @@ def get_parser():
                       action="store_true", required=False,
                       help=" ".join(
                         ["If specified, will stitch the images into a video",
-                         "And save them in the same directory as the processed",
-                         "images."]
+                         "and save them in the same directory as the processed",
+                         "images. May not work on every machine."]
                         )
                       )
 

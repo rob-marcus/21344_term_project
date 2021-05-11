@@ -8,6 +8,7 @@ import cv2
 import glob
 import helpers
 import os
+import numpy as np
 
 # in case in path is None, default to WebCam.
 class WebCam():
@@ -19,6 +20,8 @@ class WebCam():
       specified. 
       
       If the webcam cannot be accessed an assertion error will be thrown.
+
+      The webcam will be run for a total of 60 frames. 
     Args: 
       background_effect (BackgroundEffect Class): an initialized 
         BackgroundEffect class.
@@ -33,19 +36,22 @@ class WebCam():
     if video is None or not video.isOpened():
       raise AssertionError("Was unable to read from webcam.")
 
+    curr_frame = 0
+    max_frames = 9
+
     while True:
       check, frame = video.read()
       
       effected_frame = background_effect.apply_effect(frame)
       
-      cv2.imshow("Webcam view. Press q to quit.", effected_frame)
-
+      cv2.imshow("Webcam view.", effected_frame)
+      cv2.waitKey(1)   # Don't wait for a keyboard input
       write_effect(effected_frame)
 
-      key = cv2.waitKey(1)
-
-      if key == ord('q'): # Only break if user presses 'q'
-        break 
+      curr_frame += 1
+      print(curr_frame)
+      if curr_frame > max_frames: 
+        break
 
     video.release()
     cv2.destroyAllWindows()
@@ -110,13 +116,13 @@ class ApplyEffect():
     Returns: 
       (NoneType): None. 
     """
-    cv2.imwrite(self.out_path + str(curr_frame) + ".png")
+    cv2.imwrite(self.out_path + str(self.curr_frame) + ".jpg", frame)
 
     self.curr_frame += 1
 
     return
 
-  def stitch_effected_frames(self, frames, fps=20):
+  def stitch_effected_frames(self, fps=20):
     """Stitches the given frames into a video. Saved at the out_path.
     
     Args:
@@ -126,18 +132,26 @@ class ApplyEffect():
     """
     paths = os.listdir(self.out_path)
     paths.sort()
+    print(paths)
+    if paths == []: 
+      return
+
+    # get frame shape. 
+    first_frame = cv2.imread(self.out_path + paths[0])
 
     # TODO
     # Update fps to system setting...
-    if do_stitch: 
-      vid_shape = (frames[0].shape[0], frames[0].shape[1])
-      video = cv2.VideoWriter("stitched_frames.avi", 
-                              cv2.VideoWriter_fourcc(*'MJPG'), 
+    if self.do_stitch: 
+      print("Attempting to stitch frames together. Will not work on every machine :<")
+      vid_shape = (first_frame[0].shape[1], first_frame[0].shape[0])
+      video = cv2.VideoWriter(self.out_path + "stitched_frames.avi", 
+                              cv2.VideoWriter_fourcc(*'XVID'), 
                               fps,
                               vid_shape)
 
-      for frame in frames: 
-        video.write(cv2.imread(frame))
+      for path in paths: 
+        print("Looking at path {}".format(path))
+        video.write(cv2.imread(self.out_path + path).astype(np.uint8))
 
       cv2.destroyAllWindows()
       video.release
@@ -156,11 +170,10 @@ class ApplyEffect():
     # Bad design but let's just rely on the WebCam and Images class 
     # to check for errors and assume they won't give any 
     # unexpected behavior.
-    effected_frames = \
-      feed_src.run(self.background_effect, self.write_result)
+    feed_src.run(self.background_effect, self.write_effect)
 
     if self.do_stitch:
-      self.stitch_effected_frames(effected_frames)
+      self.stitch_effected_frames()
 
     return 
 
