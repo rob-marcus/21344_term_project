@@ -118,6 +118,7 @@ class BlurEffect():
   def __init__(self, blur): 
     self.blur = blur
 
+  
 class BackgroundEffect():
   def __init__(self, virtual, color, blur):
     self.virtual = virtual

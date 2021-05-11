@@ -10,7 +10,7 @@ import argparse
 import Parameters
 import sys
 from BackgroundEffect import BackgroundEffect
-
+from ApplyEffect import ApplyEffect
 def get_parser(): 
   """A simple CLI interface to run the program. 
 
@@ -117,5 +117,7 @@ if __name__ == "__main__":
                              args.stitch)
 
   be = BackgroundEffect(params.virtual, params.color, params.blur)
+
+  ApplyEffect(params.in_path, params.out_path, params.stitch, be)
 
 

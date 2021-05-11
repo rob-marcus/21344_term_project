@@ -78,7 +78,8 @@ bodypix_model = load_model(download_model(
 ))
 
 
-kernel = gaussian(2.5)
+
+erosion_kernel = np.ones((7, 7))
 
 while True: 
 
@@ -90,9 +91,14 @@ while True:
   fg = frame * fg_mask
   bg = frame - fg
 
+  midlayer_mask = fg_mask[:, :, 0] - cv2.erode(fg_mask, erosion_kernel, iterations=2)
+  midlayer_mask = cv2.dilate(midlayer_mask, erosion_kernel, iterations=3)
+  midlayer = frame * midlayer_mask[:, :, np.newaxis]
   #blurred_bg = signal.fftconvolve(bg, kernel[:, :, np.newaxis], mode="same")
-  blurred_bg = gaussian_filter(bg, sigma=(5, 5, 0))
-  cv2.imshow("Webcam view", blurred_bg + fg)
+  blurred_bg = gaussian_filter(bg, sigma=(11, 11, 0))
+  blurred_midlayer = gaussian_filter(midlayer, sigma=(3, 3, 0))
+  final_fg = fg - blurred_midlayer
+  cv2.imshow("Webcam view", blurred_bg + blurred_midlayer)
 
   key = cv2.waitKey(1)
 
