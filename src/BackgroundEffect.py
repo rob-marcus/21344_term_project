@@ -3,12 +3,12 @@
 @author: <rbm@cmu.edu>
 @date: 05/08/21
 """
-from constants import IMG_EXTS
+from constants import IMG_EXTS, bodypix_model
 import glob
 import helpers
 import os
 import skimage.transform
-
+import tensorflow as tf
 class VirtualEffect():
   def __init__(self, virtual_path):
     self.virtual_path = virtual_path
@@ -110,6 +110,7 @@ class VirtualEffect():
     resized_virtual_img = self.crop_ar(curr_virtual_img, background)
 
     return resized_virtual_img
+
 class ColorEffect():
   def __init__(self, color): 
     self.color = color
@@ -118,7 +119,27 @@ class BlurEffect():
   def __init__(self, blur): 
     self.blur = blur
 
-  
+  def apply_effect(self, image, bg_mask, fg_mask):
+    """Apply the blur to the background of image and superimposes fg
+      on the blur.
+
+    Args: 
+      image (ndarray): the image. 
+      bg_mask, fg_mask (ndarray): the masks. 
+    Returns: 
+      (ndarray): the composition of the blurred background and the preserved fg.
+    """
+    fg = image * fg_mask
+    bg = image - fg
+
+    # Sigma is the parameter defining kernel size. 
+    # Apply to the three color channels separately.  
+    blurred_bg = gaussian_filter(bg, sigma=(self.blur, self.blur, 0))
+
+    composition = blurred_bg + fg
+
+    return composition
+
 class BackgroundEffect():
   def __init__(self, virtual, color, blur):
     self.virtual = virtual
@@ -129,43 +150,66 @@ class BackgroundEffect():
     self.color_effect = ColorEffect(self.color)
     self.blur_effect = BlurEffect(self.blur)
 
-
-  def get_new_background(self, background):
+  def get_new_background(self, image, bg_mask, fg_mask):
     """Apply the specified effect to the background image. 
     
     Args: 
-      background (ndarray): the matted background image. 
+      background (ndarray): the matted background image.
+      bg_mask, fg_mask (ndarray): the respective binary masks.  
     Returns: 
       (ndarray): the matted background image with the specified effect.
     """
-    new_bg = np.zeros_like(background)
+    composition = np.zeros_like(image)
 
 
     if self.virtual:
-      new_bg = self.virtual_effect.apply_effect(background)
+      composition = self.virtual_effect.apply_effect(image, bg_mask, fg_mask)
     elif self.color: 
-      new_bg = self.color_effect.apply_effect(background)
+      composition = self.color_effect.apply_effect(image, bg_mask, fg_mask)
     elif self.blur:
-      new_bg = self.blur_effect.apply_effect(background)
+      composition = self.blur_effect.apply_effect(image, bg_mask, fg_mask)
     else: 
       raise AssertionError("No background effect specified.")
 
-    assert(new_bg.shape == background.shape)
+    assert(composition.shape == image.shape)
 
-    return new_bg
+    return composition
+
+  def get_bg_fg_masks(self, image): 
+    """Apply the bodypix model to an image, returning the fg/bg mask. 
+    
+    Args:
+      image (ndarray): the given image. 
+    Returns: 
+      A 2-tuple of: 
+        (ndarray): the background mask
+        (ndarray): the foreground mask
+      Both in the shape of the given image (but one dimensional.)
+    """
+    image_array = tf.keras.preprocessing.image.img_to_array(image)
+
+    result = bodypix_model.predict_single(image_array)
+    
+    mask = result.get_mask(threshold=0.9)
+    
+    fg_mask = mask.numpy().astype(np.uint8)
+    
+    bg_mask = np.abs(fg_mask - 1)
+
+    return bg_mask, fg_mask
 
   def apply_effect(self, image): 
     """Apply the effect to the image. 
 
     Args: 
-      background (ndarray): the matted background image. 
-      foreground (ndarray): the matted foreground image. 
+      image (ndarray): the image to be effected. 
     Returns: 
       (ndarray): the foreground image composed with the effected background. 
     """
     bg_mask, fg_mask = self.get_bg_fg_masks(image) 
-    new_bg = self.get_new_background(background)
+    composition = self.get_new_background(image, bg_mask)
 
+    return composition
 
 
 

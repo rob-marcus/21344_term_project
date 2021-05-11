@@ -38,6 +38,8 @@ class WebCam():
       
       effected_frame = background_effect.apply_effect(frame)
       
+      cv2.imshow("Webcam view. Press q to quit.", effected_frame)
+
       write_effect(effected_frame)
 
       key = cv2.waitKey(1)
@@ -53,7 +55,7 @@ class WebCam():
 class Images(): 
   def __init__(self, in_path):
     self.in_path = in_path
-    self.image_paths = 
+    self.image_paths = self.get_imgs()
 
   def get_imgs(self):
     if os.path.isfile(self.in_path): 
@@ -89,6 +91,7 @@ class Images():
       write_effect(effected_frame)
 
     return
+
 class ApplyEffect():
   def __init__(self, in_path, out_path, do_stitch, be): 
     self.in_path = in_path
@@ -113,7 +116,7 @@ class ApplyEffect():
 
     return
 
-  def stitch_effected_frames(self, frames):
+  def stitch_effected_frames(self, frames, fps=20):
     """Stitches the given frames into a video. Saved at the out_path.
     
     Args:
@@ -124,10 +127,9 @@ class ApplyEffect():
     paths = os.listdir(self.out_path)
     paths.sort()
 
-    # FPS
-    # Default to 20...
+    # TODO
+    # Update fps to system setting...
     if do_stitch: 
-      fps = 20
       vid_shape = (frames[0].shape[0], frames[0].shape[1])
       video = cv2.VideoWriter("stitched_frames.avi", 
                               cv2.VideoWriter_fourcc(*'MJPG'), 
