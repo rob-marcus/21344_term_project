@@ -5,8 +5,10 @@
 """
 import constants
 import cv2
+import glob
 import helpers
 import os
+
 # in case in path is None, default to WebCam.
 class WebCam():
   def __init__(self): 
@@ -15,7 +17,8 @@ class WebCam():
   def run(self, background_effect, write_effect): 
     """Applies the effect to the frames in the video, and writes it if 
       specified. 
-
+      
+      If the webcam cannot be accessed an assertion error will be thrown.
     Args: 
       background_effect (BackgroundEffect Class): an initialized 
         BackgroundEffect class.
@@ -45,19 +48,47 @@ class WebCam():
     video.release()
     cv2.destroyAllWindows()
 
-
+    return
 
 class Images(): 
   def __init__(self, in_path):
     self.in_path = in_path
-    self.images = self.get_imgs()
+    self.image_paths = 
 
   def get_imgs(self):
     if os.path.isfile(self.in_path): 
-      self.images = [helpers.load_img(self.in_path)]
+      self.image_paths = [self.in_path]
     else: 
-      
+      # Build path list
+      image_paths = []
 
+      for ext in constants.IMG_EXTS: 
+        image_paths += glob.glob(self.in_path + "*" + ext)
+
+    return
+
+  def run(self, background_effect, write_effect):
+    """Applies the effect to the frames in the video, and writes it if 
+      specified. 
+
+    Args: 
+      background_effect (BackgroundEffect Class): an initialized 
+        BackgroundEffect class.
+      write_effect (function): the write_effect function, uses values 
+        passed to ApplyEffect to determine where and if to write. 
+
+    Returns: 
+      (NoneType): None.
+    """
+
+    for image_path in self.image_paths: 
+      frame = helpers.load_img(image_path)
+
+      effected_frame = background_effect.apply_effect(frame)
+
+      write_effect(effected_frame)
+
+    return
 class ApplyEffect():
   def __init__(self, in_path, out_path, do_stitch, be): 
     self.in_path = in_path
