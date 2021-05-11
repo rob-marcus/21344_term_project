@@ -118,6 +118,6 @@ if __name__ == "__main__":
 
   be = BackgroundEffect(params.virtual, params.color, params.blur)
 
-  ApplyEffect(params.in_path, params.out_path, params.stitch, be)
+  effector = ApplyEffect(params.in_path, params.out_path, params.stitch, be)
 
-
+  effector.apply_effect()

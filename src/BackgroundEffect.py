@@ -154,8 +154,8 @@ class BackgroundEffect():
 
     return new_bg
 
-  def apply_effect(self, background, foreground): 
-    """Apply the effect to the background and combine with the foreground. 
+  def apply_effect(self, image): 
+    """Apply the effect to the image. 
 
     Args: 
       background (ndarray): the matted background image. 
@@ -163,6 +163,7 @@ class BackgroundEffect():
     Returns: 
       (ndarray): the foreground image composed with the effected background. 
     """
+    bg_mask, fg_mask = self.get_bg_fg_masks(image) 
     new_bg = self.get_new_background(background)
 
 

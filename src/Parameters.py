@@ -36,7 +36,10 @@ def validate_in_path(path, param_str):
 
     for ext in IMG_EXTS:
       if glob.glob(path + "*" + ext) != []:
-        contains_valid_ext = True
+        if contains_valid_ext == True: 
+          raise AssertionError("Please only have one image extension type in the in path.")
+        else: 
+          contains_valid_ext = True
 
     if not contains_valid_ext:
       err_str = ("Path error for {} argument: the folder {} has " + \
@@ -115,7 +118,7 @@ class Params():
     if self.out_path: 
       validate_out_path(self.out_path)
     else: # make the outpath just the current systime. 
-      out_path = str(time.time())[:10] + str(time.time())[11:]
+      out_path = str(time.time())[:10] + str(time.time())[11:] + "/"
       self.out_path = out_path
       os.mkdir(out_path)
       print("Out path was unspecified.")
